@@ -202,9 +202,11 @@ func (sc *snowflakeConn) Close() (err error) {
 	glog.V(2).Infoln("Close")
 	sc.stopHeartBeat()
 
-	err = sc.rest.FuncCloseSession(context.TODO(), sc.rest, sc.rest.RequestTimeout)
-	if err != nil {
-		glog.V(2).Info(err)
+	if !sc.isClientSessionKeepAliveEnabled() {
+		err = sc.rest.FuncCloseSession(context.TODO(), sc.rest, sc.rest.RequestTimeout)
+		if err != nil {
+			glog.V(2).Info(err)
+		}
 	}
 	sc.cleanup()
 	return nil
